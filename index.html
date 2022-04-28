@@ -1,160 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="./css/bootstrap.min.css" rel="stylesheet">
-  <script src="./library/js/jquery-2.2.4.js"></script>
-  <script src="./library/js/bootstrap.js"></script>
-  <style>
-    .body_info{
-      width:150px;
-    }
-    .card-text{
-      padding: 10px;
-      margin: 0px;
-    }
-  </style>
-  <script>
-    $(function(){
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="robots" content="index,follow" />
+    <meta name="description" content="計算體脂肪BMI值" />
+    <meta name="author" content="Chris Tsai" />
+    <meta name="theme-color" content="#4285f4" />
+    <link href="./css/bootstrap.min.css" rel="stylesheet" />
+    <script src="./library/js/jquery-2.2.4.js"></script>
+    <script src="./library/js/bootstrap.js"></script>
+    <style>
+      .body_info {
+        width: 150px;
+      }
+      .card-text {
+        padding: 10px;
+        margin: 0px;
+      }
+    </style>
+    <script>
+      $(function () {
+        $("#body_height").focus();
 
-      $("#body_height").focus();
+        $("*").keyup(function (e) {
+          if (e.key == "Enter") {
+            var aa = $(this).val();
+            switch ($(this).attr("id")) {
+              case "body_height":
+                //var aa = $("#body_height").val();
+                if (aa >= 50 && aa <= 250 && aa != "")
+                  $("#body_weight").focus();
+                else {
+                  alert("請輸入身高. 50~250 cm");
+                  return;
+                }
+                break;
+              case "body_weight":
+                //var aa = $("#body_weight" ).val();
+                if (aa >= 10 && aa <= 300 && aa != "") $("#body_age").focus();
+                else {
+                  alert("請輸入體重. 10~300 kg");
+                  return;
+                }
+                break;
+              case "body_age":
+                //var aa = $("#body_age").val();
+                if (aa >= 18 && aa <= 110 && aa != "")
+                  $("#btn-primary").focus();
+                else {
+                  alert("請輸入年齡. 18~110");
+                  return;
+                }
+                break;
+            }
+          }
+        });
 
-      $("*").keyup(function(e){
+        $("#btn-primary").click(function () {
+          if ($("#btn-primary").text() == "重新計算") {
+            ChangeInputStatus(false);
+            $("#body_height").focus();
+            return;
+          }
+          var height = $("#body_height").val();
+          var weight = $("#body_weight").val();
+          var age = $("#body_age").val();
+          var bmi;
+          if (height >= 50 && weight >= 10 && age >= 18) {
+            bmi = (weight / (height * height)) * 10000;
+          } else {
+            alert("請輸入正確數字.");
+            return;
+          }
 
-        if(e.key == "Enter")
-        {
-          var aa = $(this).val();
-          switch ($(this).attr("id")) {
-            case "body_height":
-                  //var aa = $("#body_height").val();
-                  if( aa >= 50 && aa <= 250 && aa !="")
-                    $("#body_weight").focus();
-                  else
-                  {
-                    alert("請輸入身高. 50~250 cm");
-                    return;
-                  }
-                  break;
-            case "body_weight":
-                  //var aa = $("#body_weight" ).val();
-                  if( aa >= 10 && aa <= 300 && aa !="")
-                    $("#body_age").focus();
-                  else
-                  {
-                      alert("請輸入體重. 10~300 kg");
-                      return;
-                  }
-                  break;
-            case "body_age":
-                  //var aa = $("#body_age").val();
-                  if( aa >= 18 && aa <= 110 && aa !="")
-                    $("#btn-primary").focus();
-                  else
-                  {
-                      alert("請輸入年齡. 18~110");
-                      return;
-                  }
-                  break;
+          bmi = bmi.toFixed(2);
+
+          var result_str =
+            "<tr><td>" +
+            age +
+            "</td><td>" +
+            height +
+            "</td><td>" +
+            weight +
+            "</td><td>" +
+            bmi +
+            "</td><td> <button id ='result_btn'>" +
+            "</button></td></tr>";
+          $(".table").append(result_str);
+          $("#result_btn").css("padding-top", "3px");
+          $("#result_btn").css("padding-bottom", "3px");
+          if (bmi > 18.5 && bmi < 24) {
+            $("#result_btn").attr("class", "btn btn btn-success");
+            $("#result_btn").text("正常");
+          } else if (bmi > 24 && bmi < 27) {
+            $("#result_btn").attr("class", "btn btn-warning");
+            $("#result_btn").html("注意");
+          } else if (bmi > 27) {
+            $("#result_btn").attr("class", "btn btn-danger");
+            $("#result_btn").html("肥胖");
+          } else if (bmi < 18.5) {
+            $("#result_btn").attr("class", "btn btn-warning");
+            $("#result_btn").html("過輕");
+          }
+
+          ChangeInputStatus(true);
+        });
+
+        function ChangeInputStatus(status) {
+          if (status) {
+            $(".body_info").attr("disabled", "true");
+            $("#btn-primary").text("重新計算");
+            $(".container").css("display", "");
+          } else {
+            $(".body_info").removeAttr("disabled", "true");
+            $(".body_info").val("");
+            $("#btn-primary").text("計算結果");
+            $(".container").css("display", "none");
+            $("tbody tr:first-child").remove();
           }
         }
       });
+    </script>
 
-      $("#btn-primary").click(function(){
-
-        if($("#btn-primary").text() == "重新計算")
-        {
-          ChangeInputStatus(false);
-          $("#body_height").focus();
-          return;
-        }
-        var height =   $("#body_height").val();
-        var weight =   $("#body_weight").val();
-        var age    =   $("#body_age").val();
-        var bmi;
-        if(height >= 50 && weight >= 10 && age >= 18){
-          bmi = (weight/(height*height))*10000;
-        }
-        else {
-          alert("請輸入正確數字.");
-          return;
-        }
-
-        bmi = bmi.toFixed(2);
-
-        var result_str = "<tr><td>"+age+"</td><td>"+height+"</td><td>"+weight+"</td><td>"+bmi+"</td><td> <button id ='result_btn'>"+"</button></td></tr>";
-        $(".table").append(result_str);
-        $("#result_btn").css("padding-top","3px");
-        $("#result_btn").css("padding-bottom","3px");
-        if(bmi > 18.5 && bmi < 24)
-        {
-          $("#result_btn").attr("class","btn btn btn-success");
-          $("#result_btn").text("正常");
-        }
-        else if(bmi > 24 && bmi < 27)
-        {
-          $("#result_btn").attr("class","btn btn-warning");
-          $("#result_btn").html("注意");
-        }
-        else if(bmi > 27)
-        {
-          $("#result_btn").attr("class","btn btn-danger");
-          $("#result_btn").html("肥胖");
-        } else if(bmi < 18.5)
-        {
-          $("#result_btn").attr("class","btn btn-warning");
-          $("#result_btn").html("過輕");
-        }
-
-        ChangeInputStatus(true);
-      });
-
-      function ChangeInputStatus(status)
-      {
-        if(status)
-        {
-          $(".body_info").attr("disabled","true");
-          $("#btn-primary").text("重新計算");
-          $(".container").css("display","");
-        }
-        else {
-          $(".body_info").removeAttr("disabled","true");
-          $(".body_info").val("");
-          $("#btn-primary").text("計算結果");
-          $(".container").css("display","none");
-          $("tbody tr:first-child").remove();
-        }
-      }
-    });
-
-  </script>
-
-  <title>BMI體指計算機</title>
-
-</head>
-<body>
-  <div class="card">
-    <div class="card-header">
-      BMI 體指計算機
-    </div>
-    <div class="card-body">
-      <h5 class="card-title"></h5>
-      <div class="row">
-        <div class="col-md-4 box">
-          <label>請輸入身高(cm)</label>
-          <input id="body_height" type="number" placeholder="請輸入身高(cm)" class ="body_info" max="250" min="50">
+    <title>BMI體指計算機</title>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-header">BMI 體指計算機</div>
+      <div class="card-body">
+        <h5 class="card-title"></h5>
+        <div class="row">
+          <div class="col-md-4 box">
+            <label>請輸入身高(cm)</label>
+            <input
+              id="body_height"
+              type="number"
+              placeholder="請輸入身高(cm)"
+              class="body_info"
+              max="250"
+              min="50"
+            />
+          </div>
+          <div class="col-md-4 box">
+            <label>請輸入體重(kg)</label>
+            <input
+              id="body_weight"
+              type="number"
+              placeholder="請輸入體重(kg)"
+              class="body_info"
+              max="300"
+              min="10"
+            />
+          </div>
+          <div class="col-md-4 box">
+            <label>請輸入年齡</label>
+            <input
+              id="body_age"
+              type="number"
+              placeholder="請輸入年齡"
+              class="body_info"
+              max="110"
+              min="18"
+            />
+          </div>
         </div>
-        <div class="col-md-4 box">
-          <label>請輸入體重(kg)</label>
-          <input id="body_weight" type="number" placeholder="請輸入體重(kg)" class ="body_info" max="300" min="10" >
-        </div>
-        <div class="col-md-4 box">
-          <label>請輸入年齡</label>
-          <input id="body_age" type="number" placeholder="請輸入年齡" class ="body_info" max="110" min="18" >
-        </div>
-      </div>
-      <h5 class="card-text">如何使用這個BMI計算工具</h5>
+        <h5 class="card-text">如何使用這個BMI計算工具</h5>
         <ul>
           <li>輸入身高，單位公分(cm)</li>
           <li>輸入體重，單位公斤(kg)</li>
@@ -162,26 +174,23 @@
           <li>BMI值會自動計算，理想體重建議僅適用成年人</li>
           <li>未成年孩童的BMI，請自行參考衛福部建議</li>
         </ul>
-      <a href="#" id="btn-primary" class="btn btn-primary">計算結果</a>
+        <a href="#" id="btn-primary" class="btn btn-primary">計算結果</a>
+      </div>
     </div>
-  </div>
-  <div class="container" style="display:none">
-  <h3>BMI計算結果</h3>
-    <table class="table table-striped table-hover " id="result_tbl">
-      <thead>
-        <tr>
-          <th>年齡</th>
-          <th>身高(cm)</th>
-          <th>體重(kg)</th>
-          <th>BMI(kg/㎡)</th>
-          <th>狀態</th>
-        </tr>
-      </thead>
-      <tbody>
-
-      </tbody>
-    </table>
-
-  </div>
-</body>
+    <div class="container" style="display: none">
+      <h3>BMI計算結果</h3>
+      <table class="table table-striped table-hover" id="result_tbl">
+        <thead>
+          <tr>
+            <th>年齡</th>
+            <th>身高(cm)</th>
+            <th>體重(kg)</th>
+            <th>BMI(kg/㎡)</th>
+            <th>狀態</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </body>
 </html>
